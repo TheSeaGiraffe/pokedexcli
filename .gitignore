@@ -1,2 +1,6 @@
 # Ignore the bin directory
 bin/
+
+# Ignore all the directories in cmd except pokedexcli
+cmd/
+!cmd/pokedexcli/

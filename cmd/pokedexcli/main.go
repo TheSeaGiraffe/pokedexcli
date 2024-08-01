@@ -17,6 +17,9 @@ func cliPrompt() {
 
 // Wonder if there's a better way of handling all the CLI prompts
 func main() {
+	apiInfo := commands.PokeAPIInfo{
+		Next: commands.PokeAPILocationsURL + fmt.Sprintf("?offset=0&limit=%d", commands.PokeAPILocationsLimit),
+	}
 	scanner := bufio.NewScanner(os.Stdin)
 	cliPrompt()
 	for scanner.Scan() {
@@ -27,10 +30,15 @@ func main() {
 			cliPrompt()
 			continue
 		}
-		if err := command.Callback(); err != nil {
-			// Not sure if we should exit the program here. Will need to think about this more.
-			log.Fatalf("Error running command '%s': %v", command.Name, err)
+		if err := command.Callback(&apiInfo); err != nil {
+			// Won't exit the program. Will instead print error message
+			// fmt.Printf("Error running command '%s': '%v'", command.Name, err)
+			fmt.Println(err)
 		}
+		if command.Name == "help" {
+			commands.PrintUsageInfo()
+		}
+
 		cliPrompt()
 	}
 
