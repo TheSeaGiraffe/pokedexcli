@@ -24,8 +24,15 @@ var CliCommandMap = map[string]CliCommand{
 	},
 }
 
+// Find a way to use the cliCommandMap to print the usage information
 func CommandHelp() error {
-	fmt.Println("This is the help message.")
+	fmt.Println()
+	fmt.Println("Welcome to the Pokedex!")
+	fmt.Println("Usage:\n")
+	fmt.Println("help: Displays a help message")
+	fmt.Println("exit: Exit the Pokedex")
+	fmt.Println()
+
 	return nil
 }
 
