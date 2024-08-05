@@ -24,7 +24,7 @@ func main() {
 		userCommand := scanner.Text()
 		command, ok := commands.CliCommandMap[userCommand]
 		if !ok {
-			fmt.Println("No such command")
+			fmt.Printf("No such command\n\n")
 			cliPrompt()
 			continue
 		}

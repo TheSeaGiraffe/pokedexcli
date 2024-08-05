@@ -5,10 +5,7 @@ import (
 	"time"
 )
 
-const (
-	purgeInterval = time.Second * 5
-	CacheTTL      = time.Second * 30
-)
+const CacheTTL = time.Second * 30
 
 type cacheEntry struct {
 	val       []byte
@@ -26,7 +23,7 @@ func NewCache(ttl time.Duration) *Cache {
 	}
 
 	go func() {
-		for range time.Tick(purgeInterval) {
+		for range time.Tick(ttl) {
 			c.mu.Lock()
 
 			for key, item := range c.items {

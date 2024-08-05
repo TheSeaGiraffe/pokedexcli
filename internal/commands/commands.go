@@ -36,7 +36,7 @@ var CliCommandMap = map[string]CliCommand{
 
 func PrintUsageInfo() {
 	for cmdName, cmd := range CliCommandMap {
-		fmt.Printf("%s: %s\n", cmdName, cmd.Description)
+		fmt.Printf("%s:\t%s\n", cmdName, cmd.Description)
 	}
 	fmt.Println()
 }
