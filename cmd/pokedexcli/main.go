@@ -17,9 +17,7 @@ func cliPrompt() {
 
 // Wonder if there's a better way of handling all the CLI prompts
 func main() {
-	apiInfo := commands.PokeAPIInfo{
-		Next: commands.PokeAPILocationsURL + fmt.Sprintf("?offset=0&limit=%d", commands.PokeAPILocationsLimit),
-	}
+	cmdMapInfo := commands.NewCommandMapInfo()
 	scanner := bufio.NewScanner(os.Stdin)
 	cliPrompt()
 	for scanner.Scan() {
@@ -30,7 +28,11 @@ func main() {
 			cliPrompt()
 			continue
 		}
-		if err := command.Callback(&apiInfo); err != nil {
+
+		// fmt.Printf("\nmap next before: '%s'\n", cmdMapInfo.Next)
+		// fmt.Printf("map previous before: '%s'\n\n", cmdMapInfo.Prev)
+
+		if err := command.Callback(cmdMapInfo); err != nil {
 			// Won't exit the program. Will instead print error message
 			// fmt.Printf("Error running command '%s': '%v'", command.Name, err)
 			fmt.Println(err)
@@ -38,6 +40,9 @@ func main() {
 		if command.Name == "help" {
 			commands.PrintUsageInfo()
 		}
+
+		// fmt.Printf("\nmap next after: '%s'\n", cmdMapInfo.Next)
+		// fmt.Printf("map previous after: '%s'\n\n", cmdMapInfo.Prev)
 
 		cliPrompt()
 	}

@@ -8,7 +8,7 @@ import (
 type CliCommand struct {
 	Name        string
 	Description string
-	Callback    func(*PokeAPIInfo) error
+	Callback    func(*CommandMapInfo) error
 }
 
 var CliCommandMap = map[string]CliCommand{
@@ -43,18 +43,16 @@ func PrintUsageInfo() {
 
 // Find a way to use the cliCommandMap to print the usage information
 // I'll have to see how Lane does it later.
-func CommandHelp(apiInfo *PokeAPIInfo) error {
+func CommandHelp(cmdMapInfo *CommandMapInfo) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
-	// fmt.Println("help: Displays a help message")
-	// fmt.Println("exit: Exit the Pokedex")
 	fmt.Println()
 
 	return nil
 }
 
-func CommandExit(apiInfo *PokeAPIInfo) error {
+func CommandExit(cmdMapInfo *CommandMapInfo) error {
 	os.Exit(0)
 	return nil
 }
