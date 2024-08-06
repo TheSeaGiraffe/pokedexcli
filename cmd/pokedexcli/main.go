@@ -2,6 +2,7 @@ package main
 
 import (
 	"bufio"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -18,7 +19,7 @@ func cliPrompt() {
 
 // Wonder if there's a better way of handling all the CLI prompts
 func main() {
-	cmdMapInfo := commands.NewCommandMapInfo()
+	cmdInfo := commands.NewCommandInfo()
 	scanner := bufio.NewScanner(os.Stdin)
 
 	var command commands.CliCommand
@@ -46,8 +47,19 @@ func main() {
 			continue
 		}
 
-		if err := command.Callback(cmdMapInfo, commandArg); err != nil {
-			fmt.Println(err.Error())
+		if err := command.Callback(cmdInfo, commandArg); err != nil {
+			if errors.Is(err, commands.ResponseFailedError) {
+				var errMsg string
+				switch {
+				case strings.Contains(command.Name, "map"):
+					errMsg = "Response failed when getting list of locations"
+				case command.Name == "explore":
+					errMsg = "Location does not exist"
+				}
+				fmt.Println(errMsg)
+			} else {
+				fmt.Println(err.Error())
+			}
 		}
 		if command.Name == "help" {
 			commands.PrintUsageInfo()
