@@ -8,7 +8,7 @@ import (
 type CliCommand struct {
 	Name        string
 	Description string
-	Callback    func(*CommandMapInfo) error
+	Callback    func(*CommandInfo, string) error
 }
 
 var CliCommandMap = map[string]CliCommand{
@@ -32,6 +32,11 @@ var CliCommandMap = map[string]CliCommand{
 		Description: "Same as map but in reverse",
 		Callback:    CommandMapb,
 	},
+	"explore": {
+		Name:        "explore",
+		Description: "Explore the specified area",
+		Callback:    CommandExplore,
+	},
 }
 
 func PrintUsageInfo() {
@@ -43,7 +48,7 @@ func PrintUsageInfo() {
 
 // Find a way to use the cliCommandMap to print the usage information
 // I'll have to see how Lane does it later.
-func CommandHelp(cmdMapInfo *CommandMapInfo) error {
+func CommandHelp(cmdInfo *CommandInfo, dummy string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -52,7 +57,7 @@ func CommandHelp(cmdMapInfo *CommandMapInfo) error {
 	return nil
 }
 
-func CommandExit(cmdMapInfo *CommandMapInfo) error {
+func CommandExit(cmdInfo *CommandInfo, dummy string) error {
 	os.Exit(0)
 	return nil
 }

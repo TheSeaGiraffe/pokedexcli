@@ -14,33 +14,34 @@ const (
 	PokeAPILocationsLimit = 20
 )
 
-type CommandMapInfo struct {
+type CommandInfo struct {
 	Next  string
 	Prev  string
 	Cache *pokecache.Cache
 }
 
-func NewCommandMapInfo() *CommandMapInfo {
-	return &CommandMapInfo{
+func NewCommandMapInfo() *CommandInfo {
+	return &CommandInfo{
 		Next:  PokeAPILocationsURL + fmt.Sprintf("?offset=0&limit=%d", PokeAPILocationsLimit),
 		Cache: pokecache.NewCache(pokecache.CacheTTL),
 	}
 }
 
 type PokeAPILocationResults struct {
-	Name string `json:name`
-	Url  string `json:url`
+	Name string `json:"name"`
+	Url  string `json:"url"`
 }
 
 type PokeAPILocations struct {
-	Count    int    `json:count`
-	Next     string `json:next`
-	Previous string `json:previous`
-	Results  []PokeAPILocationResults
+	Count    int                      `json:"count"`
+	Next     string                   `json:"next"`
+	Previous string                   `json:"previous"`
+	Results  []PokeAPILocationResults `json:"results"`
 }
 
-func unmarshallLocationDat(data []byte, locations *PokeAPILocations) error {
-	err := json.Unmarshal(data, locations)
+// func unmarshallAPIData(data []byte, locations *PokeAPILocations) error {
+func unmarshallAPIData[T any](data []byte, jsonStruct *T) error {
+	err := json.Unmarshal(data, jsonStruct)
 	if err != nil {
 		return fmt.Errorf("Could not unmarshal json: %w", err)
 	}
@@ -48,10 +49,10 @@ func unmarshallLocationDat(data []byte, locations *PokeAPILocations) error {
 	return nil
 }
 
-func getLocationData(apiURL string) ([]byte, error) {
+func getAPIData(apiURL string) ([]byte, error) {
 	res, err := http.Get(apiURL)
 	if err != nil {
-		return nil, fmt.Errorf("Problem retrieving location data: %w", err)
+		return nil, fmt.Errorf("Problem retrieving data: %w", err)
 	}
 	defer res.Body.Close()
 
@@ -100,15 +101,15 @@ func getLocationData(apiURL string) ([]byte, error) {
 
 // See if you can refactor ComandMap and ComamandMapb a bit more
 
-func CommandMap(cmdMapInfo *CommandMapInfo) error {
+func CommandMap(cmdInfo *CommandInfo, dummy string) error {
 	var body []byte
 	var found bool
 	var err error
 
 	// Attempt to get data from cache before requesting from API
-	body, found = cmdMapInfo.Cache.Get(cmdMapInfo.Next)
+	body, found = cmdInfo.Cache.Get(cmdInfo.Next)
 	if !found {
-		body, err = getLocationData(cmdMapInfo.Next)
+		body, err = getAPIData(cmdInfo.Next)
 		if err != nil {
 			return err
 		}
@@ -116,7 +117,7 @@ func CommandMap(cmdMapInfo *CommandMapInfo) error {
 
 	// Unmarshall the data
 	locations := PokeAPILocations{}
-	err = unmarshallLocationDat(body, &locations)
+	err = unmarshallAPIData(body, &locations)
 	if err != nil {
 		return err
 	}
@@ -131,10 +132,10 @@ func CommandMap(cmdMapInfo *CommandMapInfo) error {
 	// is added to the cache as it will mess up the key-value pairing. You can figure out the logic if
 	// you think about it for a bit.
 	if !found {
-		cmdMapInfo.Cache.Add(cmdMapInfo.Next, body) // This should add the url for the current page
+		cmdInfo.Cache.Add(cmdInfo.Next, body) // This should add the url for the current page
 	}
-	cmdMapInfo.Next = locations.Next // This will update the url to that of the next page
-	cmdMapInfo.Prev = locations.Previous
+	cmdInfo.Next = locations.Next // This will update the url to that of the next page
+	cmdInfo.Prev = locations.Previous
 
 	// Print the results
 	for _, area := range locations.Results {
@@ -145,14 +146,14 @@ func CommandMap(cmdMapInfo *CommandMapInfo) error {
 }
 
 // Honestly, probably want to just call Map with the url to the prev page.
-func CommandMapb(cmdMapInfo *CommandMapInfo) error {
+func CommandMapb(cmdInfo *CommandInfo, dummy string) error {
 	// Check to see if:
 	// - The map command has been called
 	// - We're already on the first page
 	//
 	// See if there's a better way of doing this
-	if cmdMapInfo.Prev == "" {
-		if cmdMapInfo.Next == PokeAPILocationsURL+fmt.Sprintf("?offset=0&limit=%d", PokeAPILocationsLimit) {
+	if cmdInfo.Prev == "" {
+		if cmdInfo.Next == PokeAPILocationsURL+fmt.Sprintf("?offset=0&limit=%d", PokeAPILocationsLimit) {
 			return fmt.Errorf("Nothing to go back to. Try calling the 'map' command.")
 		}
 		return fmt.Errorf("Already on the first page")
@@ -163,9 +164,9 @@ func CommandMapb(cmdMapInfo *CommandMapInfo) error {
 	var err error
 
 	// Attempt to get data from cache before requesting from API
-	body, found = cmdMapInfo.Cache.Get(cmdMapInfo.Prev)
+	body, found = cmdInfo.Cache.Get(cmdInfo.Prev)
 	if !found {
-		body, err = getLocationData(cmdMapInfo.Prev)
+		body, err = getAPIData(cmdInfo.Prev)
 		if err != nil {
 			return err
 		}
@@ -173,7 +174,7 @@ func CommandMapb(cmdMapInfo *CommandMapInfo) error {
 
 	// Unmarshall the data
 	locations := PokeAPILocations{}
-	err = unmarshallLocationDat(body, &locations)
+	err = unmarshallAPIData(body, &locations)
 	if err != nil {
 		return err
 	}
@@ -188,10 +189,10 @@ func CommandMapb(cmdMapInfo *CommandMapInfo) error {
 	// is added to the cache as it will mess up the key-value pairing. You can figure out the logic if
 	// you think about it for a bit.
 	if !found {
-		cmdMapInfo.Cache.Add(cmdMapInfo.Prev, body) // This should add the url for the current page
+		cmdInfo.Cache.Add(cmdInfo.Prev, body) // This should add the url for the current page
 	}
-	cmdMapInfo.Next = locations.Next
-	cmdMapInfo.Prev = locations.Previous // We update the url to that of the previous page
+	cmdInfo.Next = locations.Next
+	cmdInfo.Prev = locations.Previous // We update the url to that of the previous page
 
 	// Print the results
 	for _, area := range locations.Results {
