@@ -3,6 +3,7 @@ package commands
 import (
 	"encoding/json"
 	"fmt"
+	"strconv"
 )
 
 type PokeAPIPokemon struct {
@@ -19,9 +20,21 @@ type PokeAPILocationInfo struct {
 }
 
 func CommandExplore(cmdInfo *CommandInfo, locName string) error {
+	var err error
+
+	// Check that locName isn't empty
+	if locName == "" {
+		return fmt.Errorf("Please enter a region name")
+	}
+
+	// Check that locName isn't a number
+	_, err = strconv.ParseFloat(locName, 64)
+	if err == nil {
+		return fmt.Errorf("Please ensure that the region name is not just a number")
+	}
+
 	var body []byte
 	var found bool
-	var err error
 
 	// Attempt to get data from cache before requesting from API
 	body, found = cmdInfo.Cache.Get(locName)
