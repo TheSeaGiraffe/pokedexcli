@@ -39,7 +39,7 @@ type PokeAPILocations struct {
 	Results  []PokeAPILocationResults `json:"results"`
 }
 
-// func unmarshallAPIData(data []byte, locations *PokeAPILocations) error {
+// Might want to use a stricter constraint here in the future but for now this will do.
 func unmarshallAPIData[T any](data []byte, jsonStruct *T) error {
 	err := json.Unmarshal(data, jsonStruct)
 	if err != nil {
@@ -154,7 +154,7 @@ func CommandMapb(cmdInfo *CommandInfo, dummy string) error {
 	// See if there's a better way of doing this
 	if cmdInfo.Prev == "" {
 		if cmdInfo.Next == PokeAPILocationsURL+fmt.Sprintf("?offset=0&limit=%d", PokeAPILocationsLimit) {
-			return fmt.Errorf("Nothing to go back to. Try calling the 'map' command.")
+			return fmt.Errorf("Nothing to go back to. Try calling the 'map' command at least twice.")
 		}
 		return fmt.Errorf("Already on the first page")
 	}

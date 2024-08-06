@@ -58,11 +58,5 @@ func (c *Cache) Get(key string) ([]byte, bool) {
 		return item.val, false
 	}
 
-	// Not sure if we really need this
-	// if item.isExpired() {
-	// 	delete(c.items, key)
-	// 	return item.val, false
-	// }
-
 	return item.val, true
 }

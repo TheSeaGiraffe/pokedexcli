@@ -27,17 +27,18 @@ func main() {
 	cliPrompt()
 	for scanner.Scan() {
 		commandName, commandArg := "", ""
-		// userCommand := scanner.Text()
 		userInput := strings.Fields(scanner.Text())
 		// Find a better way of doing this
 		nUserInput := len(userInput)
-		if nUserInput > 0 {
+		if nUserInput == 0 {
+			cliPrompt()
+			continue
+		} else if nUserInput > 0 {
 			commandName = userInput[0]
 			if nUserInput > 1 {
 				commandArg = userInput[1]
 			}
 		}
-		// command, ok = commands.CliCommandMap[userCommand]
 		command, ok = commands.CliCommandMap[commandName]
 		if !ok {
 			fmt.Printf("No such command\n")
@@ -45,20 +46,12 @@ func main() {
 			continue
 		}
 
-		// fmt.Printf("\nmap next before: '%s'\n", cmdMapInfo.Next)
-		// fmt.Printf("map previous before: '%s'\n\n", cmdMapInfo.Prev)
-
 		if err := command.Callback(cmdMapInfo, commandArg); err != nil {
-			// Won't exit the program. Will instead print error message
-			// fmt.Printf("Error running command '%s': '%v'", command.Name, err)
 			fmt.Println(err.Error())
 		}
 		if command.Name == "help" {
 			commands.PrintUsageInfo()
 		}
-
-		// fmt.Printf("\nmap next after: '%s'\n", cmdMapInfo.Next)
-		// fmt.Printf("map previous after: '%s'\n\n", cmdMapInfo.Prev)
 
 		cliPrompt()
 	}
