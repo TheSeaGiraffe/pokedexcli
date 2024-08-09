@@ -3,6 +3,10 @@ package commands
 import (
 	"fmt"
 	"os"
+	"strconv"
+
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type CliCommand struct {
@@ -42,14 +46,16 @@ var CliCommandMap = map[string]CliCommand{
 		Description: "Attempt to catch the specified Pokemon",
 		Callback:    CommandCatch,
 	},
+	"inspect": {
+		Name:        "inspect",
+		Description: "View information about the specified Pokemon. Assumes that the Pokemon has already been caught",
+		Callback:    CommandInspect,
+	},
 }
 
 func PrintUsageInfo() {
 	for cmdName, cmd := range CliCommandMap {
-		// Need to add padding here.
-		// fmt.Printf("%s:%s\n", cmdName, cmd.Description)
 		fmt.Printf("%-10s%s\n", cmdName, cmd.Description)
-		// fmt.Printf("%-10s%s\n", cmdName+":", cmd.Description)
 	}
 	fmt.Println()
 }
@@ -67,5 +73,36 @@ func CommandHelp(cmdInfo *CommandInfo, dummy string) error {
 
 func CommandExit(cmdInfo *CommandInfo, dummy string) error {
 	os.Exit(0)
+	return nil
+}
+
+func CommandInspect(cmdInfo *CommandInfo, pokemonName string) error {
+	// Check that pokemonName isn't empty
+	if pokemonName == "" {
+		return fmt.Errorf("Please enter the name of a Pokemon")
+	}
+
+	// Check that pokemonName isn't a number
+	_, err := strconv.ParseFloat(pokemonName, 64)
+	if err == nil {
+		return fmt.Errorf("Please ensure that the Pokemon name is not just a number")
+	}
+
+	pokemon, ok := Pokedex[pokemonName]
+	if !ok {
+		return fmt.Errorf("You have not caught that Pokemon")
+	}
+	caser := cases.Title(language.Und)
+	fmt.Printf("Name: %s\n", caser.String(pokemon.Name))
+	fmt.Printf("Height: %d\n", pokemon.Height)
+	fmt.Printf("Weight: %d\n", pokemon.Weight)
+	fmt.Println("Stats:")
+	for _, stats := range pokemon.Stats {
+		fmt.Printf("  - %s: %d\n", stats.Stat.Name, stats.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, pokeType := range pokemon.Types {
+		fmt.Printf("  - %s\n", pokeType.Type.Name)
+	}
 	return nil
 }
