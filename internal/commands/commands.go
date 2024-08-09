@@ -37,11 +37,19 @@ var CliCommandMap = map[string]CliCommand{
 		Description: "Explore the specified area",
 		Callback:    CommandExplore,
 	},
+	"catch": {
+		Name:        "catch",
+		Description: "Attempt to catch the specified Pokemon",
+		Callback:    CommandCatch,
+	},
 }
 
 func PrintUsageInfo() {
 	for cmdName, cmd := range CliCommandMap {
-		fmt.Printf("%s:\t%s\n", cmdName, cmd.Description)
+		// Need to add padding here.
+		// fmt.Printf("%s:%s\n", cmdName, cmd.Description)
+		fmt.Printf("%-10s%s\n", cmdName, cmd.Description)
+		// fmt.Printf("%-10s%s\n", cmdName+":", cmd.Description)
 	}
 	fmt.Println()
 }

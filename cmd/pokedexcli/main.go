@@ -55,6 +55,8 @@ func main() {
 					errMsg = "Response failed when getting list of locations"
 				case command.Name == "explore":
 					errMsg = "Location does not exist"
+				case command.Name == "catch":
+					errMsg = "Does not seem to be the name of an existing Pokemon"
 				}
 				fmt.Println(errMsg)
 			} else {

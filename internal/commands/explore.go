@@ -6,17 +6,17 @@ import (
 	"strconv"
 )
 
-type PokeAPIPokemon struct {
+type PokemonInLocation struct {
 	Name string `json:"name"`
 	Url  string `json:"url"`
 }
 
-type PokeAPIEncounter struct {
-	Pokemon PokeAPIPokemon `json:"pokemon"`
+type Encounter struct {
+	Pokemon PokemonInLocation `json:"pokemon"`
 }
 
-type PokeAPILocationInfo struct {
-	PokemonEncounters []PokeAPIEncounter `json:"pokemon_encounters"`
+type LocationInfo struct {
+	PokemonEncounters []Encounter `json:"pokemon_encounters"`
 }
 
 func CommandExplore(cmdInfo *CommandInfo, locName string) error {
@@ -46,7 +46,7 @@ func CommandExplore(cmdInfo *CommandInfo, locName string) error {
 	}
 
 	// Unmarshall the data
-	locationInfo := PokeAPILocationInfo{}
+	locationInfo := LocationInfo{}
 	err = json.Unmarshal(body, &locationInfo)
 	if err != nil {
 		return fmt.Errorf("Could not unmarshal json: %w", err)
