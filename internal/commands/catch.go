@@ -96,7 +96,6 @@ func catchPokemon(baseExperience int) bool {
 	}
 
 	rng := rand.Intn(10) + 1
-	// return rng >= chanceThresh
 	return rng <= chanceThresh
 }
 
@@ -145,6 +144,7 @@ func CommandCatch(cmdInfo *CommandInfo, pokemonName string) error {
 	fmt.Printf("Throwing a Pokeball at %s...\n", caser.String(pokemon.Name))
 	if catchPokemon(pokemon.BaseExperience) {
 		fmt.Printf("%s was caught!\n", caser.String(pokemon.Name))
+		fmt.Println("You may now inspect it with the 'inspect' command.")
 		Pokedex[pokemonName] = pokemon
 	} else {
 		fmt.Printf("%s escaped!\n", caser.String(pokemon.Name))

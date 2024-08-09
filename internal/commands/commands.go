@@ -51,6 +51,11 @@ var CliCommandMap = map[string]CliCommand{
 		Description: "View information about the specified Pokemon. Assumes that the Pokemon has already been caught",
 		Callback:    CommandInspect,
 	},
+	"pokedex": {
+		Name:        "pokedex",
+		Description: "View all of the Pokemon that you have caught",
+		Callback:    CommandPokedex,
+	},
 }
 
 func PrintUsageInfo() {
@@ -103,6 +108,18 @@ func CommandInspect(cmdInfo *CommandInfo, pokemonName string) error {
 	fmt.Println("Types:")
 	for _, pokeType := range pokemon.Types {
 		fmt.Printf("  - %s\n", pokeType.Type.Name)
+	}
+	return nil
+}
+
+func CommandPokedex(cmdInfo *CommandInfo, dummy string) error {
+	if len(Pokedex) == 0 {
+		return fmt.Errorf("You have not caught any Pokemon. Try catching at least one with the 'catch' command.")
+	}
+	caser := cases.Title(language.Und)
+	fmt.Println("Your Pokedex:")
+	for _, pokemon := range Pokedex {
+		fmt.Printf("  - %s\n", caser.String(pokemon.Name))
 	}
 	return nil
 }
